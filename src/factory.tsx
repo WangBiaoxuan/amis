@@ -139,8 +139,13 @@ export function filterSchema(
   ) as Schema;
 }
 
+// 传入配置
 export function Renderer(config: RendererBasicConfig) {
+  // component 为 组件渲染器，如 Action
   return function <T extends RendererComponent>(component: T): T {
+    // 接受 配置 和 组件，返回一个 新的组件
+
+    // 不过新组件通过 registerRenderer 注册组件 处理了一层
     const renderer = registerRenderer({
       ...config,
       component: component
@@ -149,6 +154,7 @@ export function Renderer(config: RendererBasicConfig) {
   };
 }
 
+// 注册组件，congfig包含了配置和要渲染的组件
 export function registerRenderer(config: RendererConfig): RendererConfig {
   if (!config.test && !config.type) {
     throw new TypeError('please set config.test or config.type');
@@ -156,6 +162,7 @@ export function registerRenderer(config: RendererConfig): RendererConfig {
     throw new TypeError('config.component is required');
   }
 
+  // type 为config中要渲染的组件的名称
   if (typeof config.type === 'string' && config.type) {
     config.type = config.type.toLowerCase();
     config.test =
@@ -163,7 +170,9 @@ export function registerRenderer(config: RendererConfig): RendererConfig {
   }
 
   config.weight = config.weight || 0;
+  // component、Renderer 为 组件渲染器，如 Action
   config.Renderer = config.component;
+  // name 为config中要渲染的组件的名称，如 action、button、submit、reset
   config.name = config.name || config.type || `anonymous-${anonymousIndex++}`;
 
   if (~rendererNames.indexOf(config.name)) {
@@ -172,7 +181,10 @@ export function registerRenderer(config: RendererConfig): RendererConfig {
     );
   }
 
+
+  // TODO: storeType 是啥？
   if (config.storeType && config.component) {
+    // 对 Action进行包装, 注入数据？
     config.component = HocStoreFactory({
       storeType: config.storeType,
       extendsData: config.storeExtendsData,
@@ -186,10 +198,16 @@ export function registerRenderer(config: RendererConfig): RendererConfig {
 
   const idx = findIndex(
     renderers,
+    // 通过高度排序？
     item => (config.weight as number) < item.weight
   );
+
+  // 在这个renders中插入config
   ~idx ? renderers.splice(idx, 0, config) : renderers.push(config);
+  
+  // 要渲染的组件数组中插入渲染组件
   rendererNames.push(config.name);
+
   return config;
 }
 

@@ -162,6 +162,7 @@ export function themeable<
         };
 
         return (
+          // 主题的值通过 ThemeContext.Provider 传到子组件
           <ThemeContext.Provider value={theme}>
             <ComposedComponent
               {...config.getComponentConfig(ComposedComponent.themeKey)}
@@ -169,6 +170,7 @@ export function themeable<
                 T,
                 React.ComponentProps<T>
               >)}
+              // 且主题的属性也通过 属性注入到 组件当中
               {...injectedProps}
             />
           </ThemeContext.Provider>

@@ -472,6 +472,7 @@ interface ActionState {
   timeLeft: number; // 倒计时剩余时间
 }
 
+// action
 export class Action extends React.Component<ActionProps, ActionState> {
   static defaultProps = {
     type: 'button' as 'button',
@@ -680,8 +681,10 @@ export class Action extends React.Component<ActionProps, ActionState> {
   }
 }
 
+// 添加主题
 export default themeable(Action);
 
+// 高阶组件，action 渲染器
 @Renderer({
   type: 'action'
 })
@@ -734,6 +737,7 @@ export class ActionRenderer extends React.Component<
   }
 }
 
+// 
 @Renderer({
   type: 'button'
 })
@@ -743,6 +747,7 @@ export class ButtonRenderer extends ActionRenderer {}
   type: 'submit'
 })
 export class SubmitRenderer extends ActionRenderer {}
+
 
 @Renderer({
   type: 'reset'

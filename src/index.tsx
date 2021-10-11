@@ -46,6 +46,8 @@ import animation from './utils/Animation';
 export * from './Schema';
 
 // 注册渲染器
+
+// 每个可拖拽的组件都是渲染器
 import './renderers/Action';
 import './renderers/Alert';
 import './renderers/App';
