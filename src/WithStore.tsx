@@ -55,7 +55,9 @@ export function HocStoreFactory(renderer: {
         this.renderChild = this.renderChild.bind(this);
         this.refFn = this.refFn.bind(this);
 
+        // 添加 store
         const store = rootStore.addStore({
+          // 唯一值
           id: guid(),
           path: this.props.$path,
           storeType: renderer.storeType,
@@ -70,10 +72,13 @@ export function HocStoreFactory(renderer: {
 
         if (extendsData === false) {
           store.initData(
+            // 初始数据, data, defaultData中的数据放到 store中
             createObject(
+              // 上层数据
               (this.props.data as any)
                 ? (this.props.data as any).__super
                 : null,
+              // 本层数据
               {
                 ...this.formatData(
                   dataMapping(this.props.defaultData, this.props.data)
@@ -83,6 +88,7 @@ export function HocStoreFactory(renderer: {
             )
           );
         } else if (
+          // scope为独立的数据, 不取上层数据
           this.props.scope ||
           (this.props.data && (this.props.data as any).__super)
         ) {
@@ -97,7 +103,9 @@ export function HocStoreFactory(renderer: {
           } else {
             store.initData(
               createObject(
+                // 上层数据，或者scope独立数据？
                 (this.props.data as any).__super || this.props.scope,
+                // 本层数据
                 {
                   ...this.formatData(
                     dataMapping(this.props.defaultData, this.props.data)
@@ -110,6 +118,7 @@ export function HocStoreFactory(renderer: {
         } else {
           store.initData({
             ...this.formatData(
+              // from this.props.data 到 to this.props.defaultData
               dataMapping(this.props.defaultData, this.props.data)
             ),
             ...this.formatData(this.props.data)
@@ -254,6 +263,7 @@ export function HocStoreFactory(renderer: {
       componentWillUnmount() {
         const rootStore = this.context as IRendererStore;
         const store = this.store;
+        // 移除时，删除store
         rootStore.removeStore(store);
 
         // @ts-ignore
@@ -271,10 +281,13 @@ export function HocStoreFactory(renderer: {
         let {render} = this.props;
 
         return render(region, node, {
+          // 本身的数据
           data: this.store.data,
+          // 跟新数据的时间
           dataUpdatedAt: this.store.updatedAt,
           ...subProps,
           scope: this.store.data,
+          // 把父元素的store传给子元素
           store: this.store
         });
       }
@@ -298,15 +311,20 @@ export function HocStoreFactory(renderer: {
             }
             {...exprProps}
             ref={this.refFn}
+            // 把数据给data，data在store的data中
             data={this.store.data}
+            // 更新数据的时间
             dataUpdatedAt={this.store.updatedAt}
+            // 把store中数据给组件，可以在组件内部调用store.updateData方法更新数据
             store={this.store}
             scope={this.store.data}
+            // 如果有子元素，可以渲染子元素
             render={this.renderChild}
           />
         );
       }
     }
+    // 把 Component 中的静态方法，复制到 StoreFactory上
     hoistNonReactStatic(StoreFactory, Component);
 
     return StoreFactory;

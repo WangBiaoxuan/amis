@@ -23,9 +23,11 @@ export function createObject(
   properties?: any
 ): object {
   if (superProps && Object.isFrozen(superProps)) {
+    // 取上层数据
     superProps = cloneObject(superProps);
   }
 
+  // 有上层数据
   const obj = superProps
     ? Object.create(superProps, {
         ...properties,
@@ -37,6 +39,7 @@ export function createObject(
       })
     : Object.create(Object.prototype, properties);
 
+  // 本层数据
   props &&
     isObject(props) &&
     Object.keys(props).forEach(key => (obj[key] = props[key]));

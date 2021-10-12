@@ -141,7 +141,7 @@ export function filterSchema(
 
 // 传入配置
 export function Renderer(config: RendererBasicConfig) {
-  // component 为 组件渲染器，如 Action
+  // component 为 组件渲染器，如 Page、Tabs等
   return function <T extends RendererComponent>(component: T): T {
     // 接受 配置 和 组件，返回一个 新的组件
 
@@ -154,7 +154,7 @@ export function Renderer(config: RendererBasicConfig) {
   };
 }
 
-// 注册组件，congfig包含了配置和要渲染的组件
+// 注册组件，congfig包含了配置，渲染器名称 和 要渲染的组件
 export function registerRenderer(config: RendererConfig): RendererConfig {
   if (!config.test && !config.type) {
     throw new TypeError('please set config.test or config.type');
@@ -170,12 +170,13 @@ export function registerRenderer(config: RendererConfig): RendererConfig {
   }
 
   config.weight = config.weight || 0;
-  // component、Renderer 为 组件渲染器，如 Action
+  // component、Renderer 为 要注册组件，如 Action、Page、Tabs
   config.Renderer = config.component;
   // name 为config中要渲染的组件的名称，如 action、button、submit、reset
   config.name = config.name || config.type || `anonymous-${anonymousIndex++}`;
 
   if (~rendererNames.indexOf(config.name)) {
+    // 组件注册 判重逻辑
     throw new Error(
       `The renderer with name "${config.name}" has already exists, please try another name!`
     );
@@ -202,7 +203,7 @@ export function registerRenderer(config: RendererConfig): RendererConfig {
     item => (config.weight as number) < item.weight
   );
 
-  // 在这个renders中插入config
+  // 在这个render中插入config中
   ~idx ? renderers.splice(idx, 0, config) : renderers.push(config);
   
   // 要渲染的组件数组中插入渲染组件
@@ -333,8 +334,10 @@ const defaultOptions: RenderOptions = {
 let stores: {
   [propName: string]: IRendererStore;
 } = {};
+
 export function render(
   schema: Schema,
+  // 用于传递schema中要用到的数据, 可以传递 data、theme 数据进去
   props: RootRenderProps = {},
   options: RenderOptions = {},
   pathPrefix: string = ''
@@ -382,6 +385,7 @@ export function render(
 
   return (
     <EnvContext.Provider value={env}>
+      {/* 把schema、schema中要用到的数据、主题、全局数据给 ScopedRootRenderer */}
       <ScopedRootRenderer
         {...props}
         schema={schema}
@@ -442,6 +446,7 @@ export function updateEnv(options: Partial<RenderOptions>, session = 'global') {
 }
 
 let cache: {[propName: string]: RendererConfig} = {};
+// 拿到render
 export function resolveRenderer(
   path: string,
   schema?: Schema
@@ -458,6 +463,7 @@ export function resolveRenderer(
 
   let renderer: null | RendererConfig = null;
 
+  // 已注册的renders中通过 type找 ，有 renderer就返回这个render
   renderers.some(item => {
     let matched = false;
 

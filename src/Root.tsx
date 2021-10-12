@@ -68,6 +68,7 @@ export class Root extends React.Component<RootProps> {
             <ImageGallery modalContainer={env.getModalContainer}>
               <RootRenderer
                 pathPrefix={pathPrefix || ''}
+                // schema
                 schema={
                   isPlainObject(schema)
                     ? {
@@ -77,9 +78,11 @@ export class Root extends React.Component<RootProps> {
                     : schema
                 }
                 {...rest}
+                // 
                 rootStore={rootStore}
                 resolveDefinitions={this.resolveDefinitions}
                 location={location}
+                // 数据
                 data={data}
                 env={env}
                 classnames={theme.classnames}
@@ -106,7 +109,9 @@ export function renderChildren(
   props: renderChildProps
 ): ReactElement {
   if (Array.isArray(node)) {
+    // 遍历节点
     return node.map((node, index) =>
+      // 渲染子节点
       renderChild(`${prefix}/${index}`, node, {
         ...props,
         key: `${props.key ? `${props.key}-` : ''}${index}`
@@ -117,11 +122,13 @@ export function renderChildren(
   return renderChild(prefix, node, props);
 }
 
+// 渲染子元素，
 export function renderChild(
   prefix: string,
   node: SchemaNode,
   props: renderChildProps
 ): ReactElement {
+  // 子节点
   if (Array.isArray(node)) {
     return renderChildren(prefix, node, props);
   }
@@ -146,9 +153,12 @@ export function renderChild(
   }
 
   return (
+    // SchemaRenderer
     <SchemaRenderer
-      {...props}
+      // props包含了数据，data、store、scope、props等
+      {...props} 
       schema={schema}
+      // $path为 prefix + type, type即为要渲染的组件
       $path={`${prefix ? `${prefix}/` : ''}${(schema && schema.type) || ''}`}
     />
   );

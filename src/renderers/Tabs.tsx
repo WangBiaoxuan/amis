@@ -531,16 +531,16 @@ export default class Tabs extends React.Component<TabsProps, TabsState> {
             {this.renderTab
               ? this.renderTab(tab, this.props, index)
               : tabRender
-              ? tabRender(tab, this.props, index)
-              : render(
-                  `tab/${index}`,
-                  (tab as any)?.type ? (tab as any) : tab.tab || tab.body,
-                  {
-                    formMode: tab.mode || subFormMode || formMode,
-                    formHorizontal:
-                      tab.horizontal || subFormHorizontal || formHorizontal
-                  }
-                )}
+                ? tabRender(tab, this.props, index)
+                : render(
+                    `tab/${index}`,
+                    (tab as any)?.type ? (tab as any) : tab.tab || tab.body,
+                    {
+                      formMode: tab.mode || subFormMode || formMode,
+                      formHorizontal:
+                        tab.horizontal || subFormHorizontal || formHorizontal
+                    }
+                  )}
           </Tab>
         ) : null
       );

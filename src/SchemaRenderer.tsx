@@ -98,6 +98,7 @@ export class SchemaRenderer extends React.Component<SchemaRendererProps, any> {
 
   resolveRenderer(props: SchemaRendererProps, force = false): any {
     let schema = props.schema;
+    // path 就是 prefix + type, type即为要渲染的组件
     let path = props.$path;
 
     if (schema && schema.$ref) {
@@ -116,6 +117,7 @@ export class SchemaRenderer extends React.Component<SchemaRendererProps, any> {
         this.rendererKey !== `${schema.type}-${schema.$$id}`)
     ) {
       const rendererResolver = props.env.rendererResolver || resolveRenderer;
+      // 拿到组件渲染器
       this.renderer = rendererResolver(path, schema, props);
       this.rendererKey = `${schema.type}-${schema.$$id}`;
     } else {
@@ -178,6 +180,7 @@ export class SchemaRenderer extends React.Component<SchemaRendererProps, any> {
     }
 
     return renderChild(`${$path}${region ? `/${region}` : ''}`, node || '', {
+      // omit可以理解为删除rest对象中 的omitList的属性，返回删除后的对象
       ...omit(rest, omitList),
       ...subProps,
       data: subProps.data || rest.data,
@@ -201,6 +204,7 @@ export class SchemaRenderer extends React.Component<SchemaRendererProps, any> {
     const theme = this.props.env.theme;
 
     if (Array.isArray(schema)) {
+      // 子元素
       return renderChildren($path, schema as any, rest) as JSX.Element;
     }
 
@@ -224,18 +228,20 @@ export class SchemaRenderer extends React.Component<SchemaRendererProps, any> {
     }
 
     if (schema.children) {
+      // 有子元素
       return rest.invisible
         ? null
         : React.isValidElement(schema.children)
-        ? schema.children
-        : (schema.children as Function)({
-            ...rest,
-            ...exprProps,
-            $path: $path,
-            $schema: schema,
-            render: this.renderChild,
-            forwardedRef: this.refFn
-          });
+          ? schema.children
+          : (schema.children as Function)({
+              ...rest,
+              ...exprProps,
+              $path: $path,
+              $schema: schema,
+              // 如果有子元素的情况下，可以在组件内部调用render, 渲染子元素
+              render: this.renderChild,
+              forwardedRef: this.refFn
+            });
     } else if (typeof schema.component === 'function') {
       const isSFC = !(schema.component.prototype instanceof React.Component);
       const {
@@ -246,6 +252,7 @@ export class SchemaRenderer extends React.Component<SchemaRendererProps, any> {
       } = schema;
       return rest.invisible
         ? null
+        // React.createElement，参数为schema.component
         : React.createElement(schema.component as any, {
             ...rest,
             ...restSchema,
@@ -257,12 +264,15 @@ export class SchemaRenderer extends React.Component<SchemaRendererProps, any> {
             $schema: schema,
             ref: isSFC ? undefined : this.refFn,
             forwardedRef: isSFC ? this.refFn : undefined,
+            // 如果有子元素的情况下，可以在组件内部调用render, 渲染子元素
             render: this.renderChild
           });
     } else if (Object.keys(schema).length === 0) {
       return null;
     } else if (!this.renderer) {
+      // 没找到渲染组件？自定义组件？懒加载
       return rest.invisible ? null : (
+        // 懒加载
         <LazyComponent
           {...rest}
           {...exprProps}
@@ -296,6 +306,7 @@ export class SchemaRenderer extends React.Component<SchemaRendererProps, any> {
       activeKey: defaultActiveKey,
       ...restSchema
     } = schema;
+    // 拿到组件
     const Component = renderer.component;
 
     // 原来表单项的 visible: false 和 hidden: true 表单项的值和验证是有效的
@@ -313,17 +324,21 @@ export class SchemaRenderer extends React.Component<SchemaRendererProps, any> {
     }
 
     return (
+      // 拿组件渲染
       <Component
         {...theme.getRendererConfig(renderer.name)}
         {...restSchema}
         {...chainEvents(rest, restSchema)}
         {...exprProps}
+        // 数据 作为 defaultData传入
         defaultData={restSchema.defaultData ?? defaultData}
+        // 值 作为 defaultValue传入
         defaultValue={restSchema.defaultValue ?? defaultValue}
         defaultActiveKey={defaultActiveKey}
         $path={$path}
         $schema={{...schema, ...exprProps}}
         ref={this.refFn}
+        // 如果有子元素的情况下，可以在组件内部调用render, 渲染子元素
         render={this.renderChild}
       />
     );
