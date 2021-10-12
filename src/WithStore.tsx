@@ -60,6 +60,7 @@ export function HocStoreFactory(renderer: {
           // 唯一值
           id: guid(),
           path: this.props.$path,
+          // store类型，如 CRUDStore、FormStore、ModalStore
           storeType: renderer.storeType,
           parentId: this.props.store ? this.props.store.id : ''
         }) as IIRendererStore;

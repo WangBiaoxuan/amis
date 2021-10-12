@@ -183,7 +183,7 @@ export function registerRenderer(config: RendererConfig): RendererConfig {
   }
 
 
-  // TODO: storeType 是啥？
+  // TODO: storeType 是啥？ 代表是哪个type 的 store，如 CRUDStore、FormStore、ModalStore
   if (config.storeType && config.component) {
     // 对 Action进行包装, 注入数据？
     config.component = HocStoreFactory({
