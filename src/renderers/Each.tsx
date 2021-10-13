@@ -75,6 +75,7 @@ export default class Each extends React.Component<EachProps> {
           arr.map((item: any, index: number) =>
             render(`item/${index}`, items, {
               data: createObject(
+                // 把data作为子元素的__super
                 data,
                 isObject(item)
                   ? {index, ...item}

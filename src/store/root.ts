@@ -13,6 +13,8 @@ export const RootStore = ServiceStore.named('RootStore')
       return self.query
         ? createObject(
             {
+              // 假设没有 self.data.__super, 则会把self.query的值放到 子元素里面
+              // 有self.data.__super的话，当然也会放到 子元素里面
               ...(self.data && self.data.__super ? self.data.__super : null),
               ...self.query,
               __query: self.query

@@ -249,6 +249,7 @@ export class RootRenderer extends React.Component<RootRendererProps> {
         {
           renderChild(pathPrefix!, schema, {
             ...rest,
+            // 把 query中的参数、父级的数据给 子元素
             data: this.store.downStream,
             onAction: this.handleAction
           }) as JSX.Element

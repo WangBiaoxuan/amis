@@ -17,6 +17,8 @@ import {
 import {isObservable} from 'mobx';
 
 // 方便取值的时候能够把上层的取到，但是获取的时候不会全部把所有的数据获取到。
+
+// 可用于写render 组件时，把当前组件的数据放到第一个参数，给子组件
 export function createObject(
   superProps?: {[propName: string]: any},
   props?: {[propName: string]: any},
@@ -28,9 +30,13 @@ export function createObject(
   }
 
   // 有上层数据
+  // Object.create功能： obj.__proto__ = superProps;
+  // 所以 obj 能 取到 superProps 的值，且
   const obj = superProps
     ? Object.create(superProps, {
         ...properties,
+        // obj.__super === superProps;
+        // 定义了 __super 的地方
         __super: {
           value: superProps,
           writable: false,
@@ -48,7 +54,12 @@ export function createObject(
 }
 
 export function cloneObject(target: any, persistOwnProps: boolean = true) {
+
+  // obj.__proto__ = target.__super
+  // obj.__super = target.__super
+
   const obj =
+    // 克隆对象有父层数据
     target && target.__super
       ? Object.create(target.__super, {
           __super: {

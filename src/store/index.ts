@@ -27,6 +27,9 @@ setLivelynessChecking(
   process.env.NODE_ENV === 'production' ? 'ignore' : 'error'
 );
 
+// 能创建单独新的数据域的容器组件，除了最顶层的 Page，还有 CRUD、Dialog、IFrame、Form、Service 等
+// 可以理解成必须在容器组件内部，才能使用数据，才能使用变量 ${text} 模板语法
+// 参考：https://baidu.gitee.io/amis/zh-CN/docs/concepts/datascope-and-datachain#%E5%B8%B8%E8%A7%81%E8%AF%AF%E8%A7%A3
 const allowedStoreList = [
   ServiceStore,
   FormStore,
@@ -69,6 +72,7 @@ export const RendererStore = types
     }
   }))
   .actions(self => ({
+    // 添加store
     addStore(store: {
       storeType: string;
       id: string;
@@ -76,15 +80,18 @@ export const RendererStore = types
       parentId?: string;
       [propName: string]: any;
     }): IStoreNode {
+      // 根节点
       if (store.storeType === RootStore.name) {
         return addStore(RootStore.create(store, getEnv(self)));
       }
 
+      // 根据 storeType 找到要添加的store
       const factory = find(
         allowedStoreList,
         item => item.name === store.storeType
       )!;
 
+      // 
       return addStore(factory.create(store as any, getEnv(self)));
     },
 

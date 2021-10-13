@@ -7,15 +7,20 @@ const stores: {
 } = {};
 
 export function addStore(store: IStoreNode) {
+  // 根据id，创建store
   if (stores[store.id]) {
     return stores[store.id];
   }
 
+  // 每个store 的 id 都是唯一，自增的
   stores[store.id] = store;
 
   // drawer dialog 不加进去，否则有些容器就不会自我销毁 store 了。
+  
+  // 有父级store
   if (store.parentId && !/(?:dialog|drawer)$/.test(store.path)) {
     const parent = stores[store.parentId] as IIRendererStore;
+    // 把当前store添加到父级store当中
     parent.addChildId(store.id);
   }
 

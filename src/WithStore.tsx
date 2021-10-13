@@ -60,6 +60,9 @@ export function HocStoreFactory(renderer: {
           // 唯一值
           id: guid(),
           path: this.props.$path,
+          // 需要注意，只有少数几个容器组件会创建新的数据域，除了最顶层的 Page，还有 CRUD、Dialog、IFrame、Form、Service 等。
+          // 参考 数据域与数据链 https://baidu.gitee.io/amis/zh-CN/docs/concepts/datascope-and-datachain
+
           // store类型，如 CRUDStore、FormStore、ModalStore
           storeType: renderer.storeType,
           parentId: this.props.store ? this.props.store.id : ''
@@ -95,6 +98,7 @@ export function HocStoreFactory(renderer: {
         ) {
           if (this.props.store && this.props.data === this.props.store.data) {
             store.initData(
+              // this.props.store.data 作为 this.props.defaultData, this.props.data 的 super？
               createObject(this.props.store.data, {
                 ...this.formatData(
                   dataMapping(this.props.defaultData, this.props.data)
